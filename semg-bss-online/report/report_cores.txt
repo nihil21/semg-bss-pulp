@@ -1,0 +1,96 @@
+Cores 1
+gapy --target=pulp --platform=gvsoc --work-dir=/home/pulp/workspace/semg-bss-online/BUILD/PULP/GCC_RISCV/ --config-opt=cluster/nb_pe=8    run --exec-prepare --exec --binary=/home/pulp/workspace/semg-bss-online/BUILD/PULP/GCC_RISCV//semg-bss-online/semg-bss-online 
+Clock Cycles: 18937679
+Using DNN
+Clock Cycles: 938981
+Predicted class: fist
+Cores 2
+gapy --target=pulp --platform=gvsoc --work-dir=/home/pulp/workspace/semg-bss-online/BUILD/PULP/GCC_RISCV/ --config-opt=cluster/nb_pe=8    run --exec-prepare --exec --binary=/home/pulp/workspace/semg-bss-online/BUILD/PULP/GCC_RISCV//semg-bss-online/semg-bss-online 
+Clock Cycles: 9801781
+Using DNN
+Clock Cycles: 495988
+Predicted class: fist
+Cores 3
+gapy --target=pulp --platform=gvsoc --work-dir=/home/pulp/workspace/semg-bss-online/BUILD/PULP/GCC_RISCV/ --config-opt=cluster/nb_pe=8    run --exec-prepare --exec --binary=/home/pulp/workspace/semg-bss-online/BUILD/PULP/GCC_RISCV//semg-bss-online/semg-bss-online 
+Clock Cycles: 6903811
+Using DNN
+Clock Cycles: 350728
+Predicted class: fist
+Cores 4
+gapy --target=pulp --platform=gvsoc --work-dir=/home/pulp/workspace/semg-bss-online/BUILD/PULP/GCC_RISCV/ --config-opt=cluster/nb_pe=8    run --exec-prepare --exec --binary=/home/pulp/workspace/semg-bss-online/BUILD/PULP/GCC_RISCV//semg-bss-online/semg-bss-online 
+Clock Cycles: 5137010
+Using DNN
+Clock Cycles: 253497
+Predicted class: fist
+Cores 5
+gapy --target=pulp --platform=gvsoc --work-dir=/home/pulp/workspace/semg-bss-online/BUILD/PULP/GCC_RISCV/ --config-opt=cluster/nb_pe=8    run --exec-prepare --exec --binary=/home/pulp/workspace/semg-bss-online/BUILD/PULP/GCC_RISCV//semg-bss-online/semg-bss-online 
+Clock Cycles: 4240743
+Using DNN
+Clock Cycles: 207919
+Predicted class: fist
+Cores 6
+gapy --target=pulp --platform=gvsoc --work-dir=/home/pulp/workspace/semg-bss-online/BUILD/PULP/GCC_RISCV/ --config-opt=cluster/nb_pe=8    run --exec-prepare --exec --binary=/home/pulp/workspace/semg-bss-online/BUILD/PULP/GCC_RISCV//semg-bss-online/semg-bss-online 
+Clock Cycles: 3778608
+Using DNN
+Clock Cycles: 207331
+Predicted class: fist
+Cores 7
+gapy --target=pulp --platform=gvsoc --work-dir=/home/pulp/workspace/semg-bss-online/BUILD/PULP/GCC_RISCV/ --config-opt=cluster/nb_pe=8    run --exec-prepare --exec --binary=/home/pulp/workspace/semg-bss-online/BUILD/PULP/GCC_RISCV//semg-bss-online/semg-bss-online 
+Clock Cycles: 3360333
+Using DNN
+Clock Cycles: 156888
+Predicted class: fist
+Cores 8
+gapy --target=pulp --platform=gvsoc --work-dir=/home/pulp/workspace/semg-bss-online/BUILD/PULP/GCC_RISCV/ --config-opt=cluster/nb_pe=8    run --exec-prepare --exec --binary=/home/pulp/workspace/semg-bss-online/BUILD/PULP/GCC_RISCV//semg-bss-online/semg-bss-online 
+Clock Cycles: 2902043
+Using DNN
+Clock Cycles: 155768
+Predicted class: fist
+Cores 1
+gapy --target=pulp --platform=gvsoc --work-dir=/home/pulp/workspace/semg-bss-online/BUILD/PULP/GCC_RISCV/ --config-opt=cluster/nb_pe=8    run --exec-prepare --exec --binary=/home/pulp/workspace/semg-bss-online/BUILD/PULP/GCC_RISCV//semg-bss-online/semg-bss-online 
+Clock Cycles: 18937734
+Using SVM
+Clock Cycles: 141797
+Predicted class: fist
+Cores 2
+gapy --target=pulp --platform=gvsoc --work-dir=/home/pulp/workspace/semg-bss-online/BUILD/PULP/GCC_RISCV/ --config-opt=cluster/nb_pe=8    run --exec-prepare --exec --binary=/home/pulp/workspace/semg-bss-online/BUILD/PULP/GCC_RISCV//semg-bss-online/semg-bss-online 
+Clock Cycles: 9801873
+Using SVM
+Clock Cycles: 72262
+Predicted class: fist
+Cores 3
+gapy --target=pulp --platform=gvsoc --work-dir=/home/pulp/workspace/semg-bss-online/BUILD/PULP/GCC_RISCV/ --config-opt=cluster/nb_pe=8    run --exec-prepare --exec --binary=/home/pulp/workspace/semg-bss-online/BUILD/PULP/GCC_RISCV//semg-bss-online/semg-bss-online 
+Clock Cycles: 6903791
+Using SVM
+Clock Cycles: 49333
+Predicted class: fist
+Cores 4
+gapy --target=pulp --platform=gvsoc --work-dir=/home/pulp/workspace/semg-bss-online/BUILD/PULP/GCC_RISCV/ --config-opt=cluster/nb_pe=8    run --exec-prepare --exec --binary=/home/pulp/workspace/semg-bss-online/BUILD/PULP/GCC_RISCV//semg-bss-online/semg-bss-online 
+Clock Cycles: 5137078
+Using SVM
+Clock Cycles: 37712
+Predicted class: fist
+Cores 5
+gapy --target=pulp --platform=gvsoc --work-dir=/home/pulp/workspace/semg-bss-online/BUILD/PULP/GCC_RISCV/ --config-opt=cluster/nb_pe=8    run --exec-prepare --exec --binary=/home/pulp/workspace/semg-bss-online/BUILD/PULP/GCC_RISCV//semg-bss-online/semg-bss-online 
+Clock Cycles: 4240744
+Using SVM
+Clock Cycles: 30705
+Predicted class: fist
+Cores 6
+gapy --target=pulp --platform=gvsoc --work-dir=/home/pulp/workspace/semg-bss-online/BUILD/PULP/GCC_RISCV/ --config-opt=cluster/nb_pe=8    run --exec-prepare --exec --binary=/home/pulp/workspace/semg-bss-online/BUILD/PULP/GCC_RISCV//semg-bss-online/semg-bss-online 
+Clock Cycles: 3778636
+Using SVM
+Clock Cycles: 26262
+Predicted class: fist
+Cores 7
+gapy --target=pulp --platform=gvsoc --work-dir=/home/pulp/workspace/semg-bss-online/BUILD/PULP/GCC_RISCV/ --config-opt=cluster/nb_pe=8    run --exec-prepare --exec --binary=/home/pulp/workspace/semg-bss-online/BUILD/PULP/GCC_RISCV//semg-bss-online/semg-bss-online 
+Clock Cycles: 3360354
+Using SVM
+Clock Cycles: 22986
+Predicted class: hand_open
+Cores 8
+gapy --target=pulp --platform=gvsoc --work-dir=/home/pulp/workspace/semg-bss-online/BUILD/PULP/GCC_RISCV/ --config-opt=cluster/nb_pe=8    run --exec-prepare --exec --binary=/home/pulp/workspace/semg-bss-online/BUILD/PULP/GCC_RISCV//semg-bss-online/semg-bss-online 
+Clock Cycles: 2902080
+Using SVM
+Clock Cycles: 20419
+Predicted class: rest
