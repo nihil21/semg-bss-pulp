@@ -19,6 +19,7 @@
 */ 
 
 #include "pmsis.h"
+#include "pulp_train_defines.h"
 
 /**
  * =====> STRUCTURES <=====

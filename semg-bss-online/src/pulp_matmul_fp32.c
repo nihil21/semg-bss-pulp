@@ -18,8 +18,8 @@
  * Authors: Davide Nadalini, Leonardo Ravaglia
 */ 
 
-#include "../include/pulp_train_utils_fp32.h"
-#include "../include/pulp_matmul_fp32.h"
+#include "pulp_train_utils_fp32.h"
+#include "pulp_matmul_fp32.h"
 
 #include "pmsis.h"
 
@@ -41,7 +41,7 @@ void mm(void * void_args) {
 
   int transp = args->trans_B;
 
-  const int blockSize = (N+CORES-1) / CORES;
+  const int blockSize = (N+NUM_CORES-1) / NUM_CORES;
   const int start = pi_core_id()*blockSize;
   const int stop = start+blockSize > N ? N : start+blockSize;
 
@@ -133,7 +133,7 @@ void mm_M(void * void_args) {
 
   int transp = args->trans_B;
 
-  const int blockSize = (M+CORES-1) / CORES;
+  const int blockSize = (M+NUM_CORES-1) / NUM_CORES;
   const int start = pi_core_id()*blockSize;
   const int stop = start+blockSize > M ? M: start+blockSize;
 
@@ -197,7 +197,7 @@ void mm_dw(void * void_args) {
   int num_MAC = 0;
   #endif
 
-  int blockSize = (N+CORES-1) / CORES;
+  int blockSize = (N+NUM_CORES-1) / NUM_CORES;
   int start = pi_core_id()*blockSize;
   int stop = start+blockSize > N ? N : start+blockSize;
 
@@ -257,7 +257,7 @@ void mm_dw_in_grad(void * void_args) {
   int K = args->K;
   int ker_dim = args->ker_size;
 
-  int blockSize = ((K/ker_dim)+CORES-1) / CORES;
+  int blockSize = ((K/ker_dim)+NUM_CORES-1) / NUM_CORES;
   int start = pi_core_id()*blockSize;
   int stop = start+blockSize > (K/ker_dim) ? (K/ker_dim) : start+blockSize;
 
@@ -313,7 +313,7 @@ void mm_conv2d_in_grad (void * void_args)
   const int pCin = args->pCin;
   const int pCout = args->pCout;
 
-  const int blockSize = (M+CORES-1) / CORES;
+  const int blockSize = (M+NUM_CORES-1) / NUM_CORES;
   const int start = pi_core_id()*blockSize;
   const int stop = start+blockSize > M ? M : start+blockSize;
 
@@ -376,7 +376,7 @@ void mm_u2 (void * void_args) {
 
   int transp = args->trans_B;
 
-  int blockSize = (N+CORES-1) / CORES;
+  int blockSize = (N+NUM_CORES-1) / NUM_CORES;
   int start = pi_core_id()*blockSize;
   int stop = start+blockSize > N ? N : start+blockSize;
 
@@ -454,7 +454,7 @@ void mm_unroll_1x2 (void * void_args)
   int K = args->K;
   int transp = args->trans_B;
 
-  int blockSize = (N+CORES-1) / CORES;
+  int blockSize = (N+NUM_CORES-1) / NUM_CORES;
   int start = pi_core_id()*blockSize;
   int stop = start+blockSize > N ? N : start+blockSize;
 
@@ -552,7 +552,7 @@ void mm_unroll_1x4 (void * void_args)
   int K = args->K;
   int transp = args->trans_B;
 
-  int blockSize = (N+CORES-1) / CORES;
+  int blockSize = (N+NUM_CORES-1) / NUM_CORES;
   int start = pi_core_id()*blockSize;
   int stop = start+blockSize > N ? N : start+blockSize;
 
@@ -668,7 +668,7 @@ void mm_unroll_1x8 (void * void_args)
   int K = args->K;
   int transp = args->trans_B;
 
-  int blockSize = (N+CORES-1) / CORES;
+  int blockSize = (N+NUM_CORES-1) / NUM_CORES;
   int start = pi_core_id()*blockSize;
   int stop = start+blockSize > N ? N : start+blockSize;
 
@@ -813,12 +813,12 @@ void mm_unroll_2x1 (void * void_args)
   int N_left = N - N_par;
   int core_id = pi_core_id();
 
-  int blockSize = (N_par+CORES-1) / CORES;
+  int blockSize = (N_par+NUM_CORES-1) / NUM_CORES;
   int start = core_id*blockSize;
   int stop = start+blockSize > N_par ? N_par : start+blockSize;
 
   // Check if sizes are smaller than the unrolling, and take countermeasures
-  if ((N_par/CORES) < 2) { mm(args); }
+  if ((N_par/NUM_CORES) < 2) { mm(args); }
   else
   {  
     // =====> B NOT TRANSPOSED <=====
@@ -845,7 +845,7 @@ void mm_unroll_2x1 (void * void_args)
       // Leftover on N (parallel on M)
       if (N_left > 0)
       {
-        int j_block = (M+CORES-1) / CORES;
+        int j_block = (M+NUM_CORES-1) / NUM_CORES;
         int j_start = core_id*j_block;
         int j_stop = j_start+j_block > M ? M : j_start+j_block;       
 
@@ -888,7 +888,7 @@ void mm_unroll_2x1 (void * void_args)
       // Leftover on N (parallel on M)
       if (N_left > 0)
       {
-        int j_block = (M+CORES-1) / CORES;
+        int j_block = (M+NUM_CORES-1) / NUM_CORES;
         int j_start = core_id*j_block;
         int j_stop = j_start+j_block > M ? M : j_start+j_block;       
 
@@ -928,12 +928,12 @@ void mm_unroll_4x1 (void * void_args)
   int N_left = N - N_par;
   int core_id = pi_core_id();
 
-  int blockSize = (N_par+CORES-1) / CORES;
+  int blockSize = (N_par+NUM_CORES-1) / NUM_CORES;
   int start = core_id*blockSize;
   int stop = start+blockSize > N_par ? N_par : start+blockSize;
 
   // Check if sizes are smaller than the unrolling, and take countermeasures
-  if ((N_par/CORES) < 4) { mm_unroll_2x1(args); }
+  if ((N_par/NUM_CORES) < 4) { mm_unroll_2x1(args); }
   else
   {  
     // =====> B NOT TRANSPOSED <=====
@@ -966,7 +966,7 @@ void mm_unroll_4x1 (void * void_args)
       // Leftover on N (parallel on M)
       if (N_left > 0)
       {
-        int j_block = (M+CORES-1) / CORES;
+        int j_block = (M+NUM_CORES-1) / NUM_CORES;
         int j_start = core_id*j_block;
         int j_stop = j_start+j_block > M ? M : j_start+j_block;       
 
@@ -1015,7 +1015,7 @@ void mm_unroll_4x1 (void * void_args)
       // Leftover on N (parallel on M)
       if (N_left > 0)
       {
-        int j_block = (M+CORES-1) / CORES;
+        int j_block = (M+NUM_CORES-1) / NUM_CORES;
         int j_start = core_id*j_block;
         int j_stop = j_start+j_block > M ? M : j_start+j_block;       
 
@@ -1055,12 +1055,12 @@ void mm_unroll_8x1 (void * void_args)
   int N_left = N - N_par;
   int core_id = pi_core_id();
 
-  int blockSize = (N_par+CORES-1) / CORES;
+  int blockSize = (N_par+NUM_CORES-1) / NUM_CORES;
   int start = core_id*blockSize;
   int stop = start+blockSize > N_par ? N_par : start+blockSize;
 
   // Check if sizes are smaller than the unrolling, and take countermeasures
-  if ((N_par/CORES) < 8) { mm_unroll_4x1(args); }
+  if ((N_par/NUM_CORES) < 8) { mm_unroll_4x1(args); }
   else
   {  
     // =====> B NOT TRANSPOSED <=====
@@ -1105,7 +1105,7 @@ void mm_unroll_8x1 (void * void_args)
       // Leftover on N (parallel on M)
       if (N_left > 0)
       {
-        int j_block = (M+CORES-1) / CORES;
+        int j_block = (M+NUM_CORES-1) / NUM_CORES;
         int j_start = core_id*j_block;
         int j_stop = j_start+j_block > M ? M : j_start+j_block;       
 
@@ -1166,7 +1166,7 @@ void mm_unroll_8x1 (void * void_args)
       // Leftover on N (parallel on M)
       if (N_left > 0)
       {
-        int j_block = (M+CORES-1) / CORES;
+        int j_block = (M+NUM_CORES-1) / NUM_CORES;
         int j_start = core_id*j_block;
         int j_stop = j_start+j_block > M ? M : j_start+j_block;       
 
@@ -1205,7 +1205,7 @@ void mm_unroll_2x2 (void * void_args)
   int N_left = N - N_par;
   int core_id = pi_core_id();
 
-  int blockSize = (N_par+CORES-1) / CORES;
+  int blockSize = (N_par+NUM_CORES-1) / NUM_CORES;
   int start = core_id*blockSize;
   int stop = start+blockSize > N_par ? N_par : start+blockSize;
 
@@ -1216,7 +1216,7 @@ void mm_unroll_2x2 (void * void_args)
   float temp3 = 0;
 
   // Check if sizes are smaller than the unrolling, and take countermeasures
-  if ((N_par/CORES) < 2) { mm_unroll_1x8(args); }
+  if ((N_par/NUM_CORES) < 2) { mm_unroll_1x8(args); }
   else 
   {
     // =====> B NOT TRANSPOSED <=====
@@ -1269,7 +1269,7 @@ void mm_unroll_2x2 (void * void_args)
       // Leftover in N (parallel on M)
       if (N_left > 0)
       {
-        int j_block = (M+CORES-1) / CORES;
+        int j_block = (M+NUM_CORES-1) / NUM_CORES;
         int j_start = core_id*j_block;
         int j_stop = j_start+j_block > M ? M : j_start+j_block;
 
@@ -1335,7 +1335,7 @@ void mm_unroll_2x2 (void * void_args)
       // Leftover in N (parallel on M)
       if (N_left > 0)
       {
-        int j_block = (M+CORES-1) / CORES;
+        int j_block = (M+NUM_CORES-1) / NUM_CORES;
         int j_start = core_id*j_block;
         int j_stop = j_start+j_block > M ? M : j_start+j_block;
 
@@ -1371,7 +1371,7 @@ void mm_unroll_2x4 (void * void_args)
   int N_left = N - N_par;
   int core_id = pi_core_id();
 
-  int blockSize = (N_par+CORES-1) / CORES;
+  int blockSize = (N_par+NUM_CORES-1) / NUM_CORES;
   int start = core_id*blockSize;
   int stop = start+blockSize > N_par ? N_par : start+blockSize;
 
@@ -1386,7 +1386,7 @@ void mm_unroll_2x4 (void * void_args)
   float temp7 = 0;
 
   // Check if sizes are smaller than the unrolling, and take countermeasures
-  if      ((N_par/CORES) < 2) { mm_unroll_1x8(args); }
+  if      ((N_par/NUM_CORES) < 2) { mm_unroll_1x8(args); }
   else if (M < 4)                 { mm_unroll_2x2(args); }
   else 
   {
@@ -1457,7 +1457,7 @@ void mm_unroll_2x4 (void * void_args)
       // Leftover in N (parallel on M)
       if (N_left > 0)
       {
-        int j_block = (M+CORES-1) / CORES;
+        int j_block = (M+NUM_CORES-1) / NUM_CORES;
         int j_start = core_id*j_block;
         int j_stop = j_start+j_block > M ? M : j_start+j_block;
 
@@ -1540,7 +1540,7 @@ void mm_unroll_2x4 (void * void_args)
       // Leftover in N (parallel on M)
       if (N_left > 0)
       {
-        int j_block = (M+CORES-1) / CORES;
+        int j_block = (M+NUM_CORES-1) / NUM_CORES;
         int j_start = core_id*j_block;
         int j_stop = j_start+j_block > M ? M : j_start+j_block;
 
@@ -1576,7 +1576,7 @@ void mm_unroll_4x2 (void * void_args)
   int N_left = N - N_par;
   int core_id = pi_core_id();
 
-  int blockSize = (N_par+CORES-1) / CORES;
+  int blockSize = (N_par+NUM_CORES-1) / NUM_CORES;
   int start = core_id*blockSize;
   int stop = start+blockSize > N_par ? N_par : start+blockSize;
 
@@ -1591,7 +1591,7 @@ void mm_unroll_4x2 (void * void_args)
   float temp7 = 0;
 
   // Check if sizes are smaller than the unrolling, and take countermeasures
-  if      ((N_par/CORES) < 4) { mm_unroll_1x8(args); }
+  if      ((N_par/NUM_CORES) < 4) { mm_unroll_1x8(args); }
   else if (M < 2)                 { mm_unroll_2x2(args); }
   else 
   {
@@ -1664,7 +1664,7 @@ void mm_unroll_4x2 (void * void_args)
       // Leftover in N (parallel on M)
       if (N_left > 0)
       {
-        int j_block = (M+CORES-1) / CORES;
+        int j_block = (M+NUM_CORES-1) / NUM_CORES;
         int j_start = core_id*j_block;
         int j_stop = j_start+j_block > M ? M : j_start+j_block;
 
@@ -1752,7 +1752,7 @@ void mm_unroll_4x2 (void * void_args)
       // Leftover in N (parallel on M)
       if (N_left > 0)
       {
-        int j_block = (M+CORES-1) / CORES;
+        int j_block = (M+NUM_CORES-1) / NUM_CORES;
         int j_start = core_id*j_block;
         int j_stop = j_start+j_block > M ? M : j_start+j_block;
 
@@ -1791,7 +1791,7 @@ void mm_unroll_4x4 (void * void_args)
   int N_left = N - N_par;
   int core_id = pi_core_id();
 
-  int blockSize = (N_par+CORES-1) / CORES;
+  int blockSize = (N_par+NUM_CORES-1) / NUM_CORES;
   int start = core_id*blockSize;
   int stop = start+blockSize > N_par ? N_par : start+blockSize;
 
@@ -1806,8 +1806,8 @@ void mm_unroll_4x4 (void * void_args)
   float temp7 = 0;  float temp15  = 0;
 
   // Check if sizes are smaller than the unrolling, and take countermeasures
-  if      ((N_par/CORES) < 2) { mm_unroll_1x8(args); }
-  else if ((N_par/CORES) < 4) { mm_unroll_2x4(args); }
+  if      ((N_par/NUM_CORES) < 2) { mm_unroll_1x8(args); }
+  else if ((N_par/NUM_CORES) < 4) { mm_unroll_2x4(args); }
   else if (M < 4)                 { mm_unroll_2x2(args); }
   else 
   {
@@ -1898,7 +1898,7 @@ void mm_unroll_4x4 (void * void_args)
       // Leftover in N (parallel on M)
       if (N_left > 0)
       {
-        int j_block = (M+CORES-1) / CORES;
+        int j_block = (M+NUM_CORES-1) / NUM_CORES;
         int j_start = core_id*j_block;
         int j_stop = j_start+j_block > M ? M : j_start+j_block;
 
@@ -2004,7 +2004,7 @@ void mm_unroll_4x4 (void * void_args)
       // Leftover in N (parallel on M)
       if (N_left > 0)
       {
-        int j_block = (M+CORES-1) / CORES;
+        int j_block = (M+NUM_CORES-1) / NUM_CORES;
         int j_start = core_id*j_block;
         int j_stop = j_start+j_block > M ? M : j_start+j_block;
 
@@ -2049,7 +2049,7 @@ void mm_M_u2 (void * void_args) {
 
   int transp = args->trans_B;
 
-  int blockSize = (M+CORES-1) / CORES;
+  int blockSize = (M+NUM_CORES-1) / NUM_CORES;
   int start = pi_core_id()*blockSize;
   int stop = start+blockSize > M ? M : start+blockSize;
 
@@ -2130,7 +2130,7 @@ void mm_M_unroll_2x1 (void * void_args)
   int N_par = N & 0xfffffffe;
   int N_left = N - N_par;
 
-  int blockSize = (M+CORES-1) / CORES;
+  int blockSize = (M+NUM_CORES-1) / NUM_CORES;
   int start = pi_core_id()*blockSize;
   int stop = start+blockSize > M ? M : start+blockSize;
 
@@ -2231,7 +2231,7 @@ void mm_M_unroll_4x1 (void * void_args)
   int N_par = N & 0xfffffffc;
   int N_left = N - N_par;
 
-  int blockSize = (M+CORES-1) / CORES;
+  int blockSize = (M+NUM_CORES-1) / NUM_CORES;
   int start = pi_core_id()*blockSize;
   int stop = start+blockSize > M ? M : start+blockSize;
 
@@ -2354,7 +2354,7 @@ void mm_M_unroll_8x1 (void * void_args)
   int N_par = N & 0xfffffff8;
   int N_left = N - N_par;
 
-  int blockSize = (M+CORES-1) / CORES;
+  int blockSize = (M+NUM_CORES-1) / NUM_CORES;
   int start = pi_core_id()*blockSize;
   int stop = start+blockSize > M ? M : start+blockSize;
 
@@ -2511,12 +2511,12 @@ void mm_M_unroll_1x2 (void * void_args) {
   int M_left = M - M_par;
   int core_id = pi_core_id();
 
-  int blockSize = (M_par+CORES-1) / CORES;
+  int blockSize = (M_par+NUM_CORES-1) / NUM_CORES;
   int start = core_id*blockSize;
   int stop = start+blockSize > M_par ? M_par: start+blockSize;
 
   // Check if sizes are smaller than the unrolling, and take countermeasures
-  if      ((M_par/CORES) < 2) { mm_M(args); }
+  if      ((M_par/NUM_CORES) < 2) { mm_M(args); }
   else
   {
     // =====> B NOT TRANSPOSED <=====
@@ -2543,7 +2543,7 @@ void mm_M_unroll_1x2 (void * void_args) {
       // Leftover in M (parallel in N)
       if (M_left > 0)
       {
-        int i_block = (N+CORES-1) / CORES;
+        int i_block = (N+NUM_CORES-1) / NUM_CORES;
         int i_start = core_id*i_block;
         int i_stop = i_start+i_block > N ? N : i_start+i_block;   
 
@@ -2587,7 +2587,7 @@ void mm_M_unroll_1x2 (void * void_args) {
       // Leftover in M (parallel in N)
       if (M_left > 0)
       {
-        int i_block = (N+CORES-1) / CORES;
+        int i_block = (N+NUM_CORES-1) / NUM_CORES;
         int i_start = core_id*i_block;
         int i_stop = i_start+i_block > N ? N : i_start+i_block;      
 
@@ -2628,12 +2628,12 @@ void mm_M_unroll_1x4 (void * void_args) {
   int M_left = M - M_par;
   int core_id = pi_core_id();
 
-  int blockSize = (M_par+CORES-1) / CORES;
+  int blockSize = (M_par+NUM_CORES-1) / NUM_CORES;
   int start = core_id*blockSize;
   int stop = start+blockSize > M_par ? M_par: start+blockSize;
 
   // Check if sizes are smaller than the unrolling, and take countermeasures
-  if      ((M_par/CORES) < 4) { mm_M_unroll_1x2(args); }
+  if      ((M_par/NUM_CORES) < 4) { mm_M_unroll_1x2(args); }
   else 
   {
     // =====> B NOT TRANSPOSED <=====
@@ -2666,7 +2666,7 @@ void mm_M_unroll_1x4 (void * void_args) {
       // Leftover in M (parallel in N)
       if (M_left > 0)
       {
-        int i_block = (N+CORES-1) / CORES;
+        int i_block = (N+NUM_CORES-1) / NUM_CORES;
         int i_start = core_id*i_block;
         int i_stop = i_start+i_block > N ? N : i_start+i_block;      
 
@@ -2710,7 +2710,7 @@ void mm_M_unroll_1x4 (void * void_args) {
       // Leftover in M (parallel in N)
       if (M_left > 0)
       {
-        int i_block = (N+CORES-1) / CORES;
+        int i_block = (N+NUM_CORES-1) / NUM_CORES;
         int i_start = core_id*i_block;
         int i_stop = i_start+i_block > N ? N : i_start+i_block;      
 
@@ -2751,12 +2751,12 @@ void mm_M_unroll_1x8 (void * void_args) {
   int M_left = M - M_par;
   int core_id = pi_core_id();
 
-  int blockSize = (M_par+CORES-1) / CORES;
+  int blockSize = (M_par+NUM_CORES-1) / NUM_CORES;
   int start = core_id*blockSize;
   int stop = start+blockSize > M_par ? M_par: start+blockSize;
 
   // Check if sizes are smaller than the unrolling, and take countermeasures
-  if      ((M_par/CORES) < 8) { mm_M_unroll_1x4(args); }
+  if      ((M_par/NUM_CORES) < 8) { mm_M_unroll_1x4(args); }
   else 
   {
     // =====> B NOT TRANSPOSED <=====
@@ -2801,7 +2801,7 @@ void mm_M_unroll_1x8 (void * void_args) {
       // Leftover in M (parallel in N)
       if (M_left > 0)
       {
-        int i_block = (N+CORES-1) / CORES;
+        int i_block = (N+NUM_CORES-1) / NUM_CORES;
         int i_start = core_id*i_block;
         int i_stop = i_start+i_block > N ? N : i_start+i_block;      
 
@@ -2863,7 +2863,7 @@ void mm_M_unroll_1x8 (void * void_args) {
       // Leftover in M (parallel in N)
       if (M_left > 0)
       {
-        int i_block = (N+CORES-1) / CORES;
+        int i_block = (N+NUM_CORES-1) / NUM_CORES;
         int i_start = core_id*i_block;
         int i_stop = i_start+i_block > N ? N : i_start+i_block;      
 
@@ -2906,7 +2906,7 @@ void mm_M_unroll_2x2 (void * void_args)
   int N_par = N & 0xfffffffe;
   int N_left = N - N_par;
 
-  int blockSize = (M_par+CORES-1) / CORES;
+  int blockSize = (M_par+NUM_CORES-1) / NUM_CORES;
   int start = core_id*blockSize;
   int stop = start+blockSize > M_par ? M_par : start+blockSize;
 
@@ -2917,7 +2917,7 @@ void mm_M_unroll_2x2 (void * void_args)
   float temp3 = 0;
 
   // Check if sizes are smaller than the unrolling, and take countermeasures
-  if      ((M_par/CORES) < 2) { mm_M_unroll_8x1(args); }
+  if      ((M_par/NUM_CORES) < 2) { mm_M_unroll_8x1(args); }
   else 
   {
     // =====> B NOT TRANSPOSED <=====
@@ -2969,7 +2969,7 @@ void mm_M_unroll_2x2 (void * void_args)
       // Leftover on M (parallel on N)
       if (M_left > 0)
       {
-        int i_block = (N+CORES-1) / CORES;
+        int i_block = (N+NUM_CORES-1) / NUM_CORES;
         int i_start = core_id*i_block;
         int i_stop = i_start+i_block > N ? N : i_start+i_block;
 
@@ -3035,7 +3035,7 @@ void mm_M_unroll_2x2 (void * void_args)
       // Leftover on M (parallel on N)
       if (M_left > 0)
       {
-        int i_block = (N+CORES-1) / CORES;
+        int i_block = (N+NUM_CORES-1) / NUM_CORES;
         int i_start = core_id*i_block;
         int i_stop = i_start+i_block > N ? N : i_start+i_block;
 
@@ -3075,7 +3075,7 @@ void mm_M_unroll_4x2 (void * void_args)
   int N_par = N & 0xfffffffc;
   int N_left = N - N_par;
 
-  int blockSize = (M_par+CORES-1) / CORES;
+  int blockSize = (M_par+NUM_CORES-1) / NUM_CORES;
   int start = core_id*blockSize;
   int stop = start+blockSize > M_par ? M_par : start+blockSize;
 
@@ -3090,7 +3090,7 @@ void mm_M_unroll_4x2 (void * void_args)
   float temp7 = 0;
 
   // Check if sizes are smaller than the unrolling, and take countermeasures
-  if      ((M_par/CORES) < 2) { mm_M_unroll_8x1(args); }
+  if      ((M_par/NUM_CORES) < 2) { mm_M_unroll_8x1(args); }
   else if (N < 4)                 { mm_M_unroll_2x2(args); }
   else 
   {
@@ -3155,7 +3155,7 @@ void mm_M_unroll_4x2 (void * void_args)
       // Leftover on M (parallel on N)
       if (M_left > 0)
       {
-        int i_block = (N+CORES-1) / CORES;
+        int i_block = (N+NUM_CORES-1) / NUM_CORES;
         int i_start = core_id*i_block;
         int i_stop = i_start+i_block > N ? N : i_start+i_block;
 
@@ -3232,7 +3232,7 @@ void mm_M_unroll_4x2 (void * void_args)
       // Leftover on M (parallel on N)
       if (M_left > 0)
       {
-        int i_block = (N+CORES-1) / CORES;
+        int i_block = (N+NUM_CORES-1) / NUM_CORES;
         int i_start = core_id*i_block;
         int i_stop = i_start+i_block > N ? N : i_start+i_block;
 
@@ -3271,7 +3271,7 @@ void mm_M_unroll_2x4 (void * void_args)
   int N_par = N & 0xfffffffe;
   int N_left = N - N_par;
 
-  int blockSize = (M_par+CORES-1) / CORES;
+  int blockSize = (M_par+NUM_CORES-1) / NUM_CORES;
   int start = core_id*blockSize;
   int stop = start+blockSize > M_par ? M_par : start+blockSize;
 
@@ -3286,7 +3286,7 @@ void mm_M_unroll_2x4 (void * void_args)
   float temp7 = 0;
 
   // Check if sizes are smaller than the unrolling, and take countermeasures
-  if      ((M_par/CORES) < 4) { mm_M_unroll_8x1(args); }
+  if      ((M_par/NUM_CORES) < 4) { mm_M_unroll_8x1(args); }
   else if (N < 2)                 { mm_M_unroll_2x2(args); }
   else 
   {
@@ -3355,7 +3355,7 @@ void mm_M_unroll_2x4 (void * void_args)
       // Leftover on M (parallel on N)
       if (M_left > 0)
       {
-        int i_block = (N+CORES-1) / CORES;
+        int i_block = (N+NUM_CORES-1) / NUM_CORES;
         int i_start = core_id*i_block;
         int i_stop = i_start+i_block > N ? N : i_start+i_block;
 
@@ -3439,7 +3439,7 @@ void mm_M_unroll_2x4 (void * void_args)
       // Leftover on M (parallel on N)
       if (M_left > 0)
       {
-        int i_block = (N+CORES-1) / CORES;
+        int i_block = (N+NUM_CORES-1) / NUM_CORES;
         int i_start = core_id*i_block;
         int i_stop = i_start+i_block > N ? N : i_start+i_block;
 
@@ -3478,7 +3478,7 @@ void mm_M_unroll_4x4 (void * void_args)
   int M_left = M - M_par;
   int core_id = pi_core_id();
 
-  int blockSize = (M_par+CORES-1) / CORES;
+  int blockSize = (M_par+NUM_CORES-1) / NUM_CORES;
   int start = core_id*blockSize;
   int stop = start+blockSize > M_par ? M_par : start+blockSize;
 
@@ -3493,8 +3493,8 @@ void mm_M_unroll_4x4 (void * void_args)
   float temp7 = 0;  float temp15 = 0;
 
   // Check if sizes are smaller than the unrolling, and take countermeasures
-  if      ((M_par/CORES) < 2) { mm_M_unroll_8x1(args); }
-  else if ((M_par/CORES) < 4) { mm_M_unroll_4x2(args); }
+  if      ((M_par/NUM_CORES) < 2) { mm_M_unroll_8x1(args); }
+  else if ((M_par/NUM_CORES) < 4) { mm_M_unroll_4x2(args); }
   else if (N < 4)                 { mm_M_unroll_2x2(args); }
   else 
   {
@@ -3584,7 +3584,7 @@ void mm_M_unroll_4x4 (void * void_args)
       // Leftover on M (parallel on N)
       if (M_left > 0)
       {
-        int i_block = (N+CORES-1) / CORES;
+        int i_block = (N+NUM_CORES-1) / NUM_CORES;
         int i_start = core_id*i_block;
         int i_stop = i_start+i_block > N ? N : i_start+i_block;
 
@@ -3689,7 +3689,7 @@ void mm_M_unroll_4x4 (void * void_args)
       // Leftover on M (parallel on N)
       if (M_left > 0)
       {
-        int i_block = (N+CORES-1) / CORES;
+        int i_block = (N+NUM_CORES-1) / NUM_CORES;
         int i_start = core_id*i_block;
         int i_stop = i_start+i_block > N ? N : i_start+i_block;
 
@@ -3744,7 +3744,7 @@ void mm_dw_u2(void * void_args) {
   if (ker_dim < 2) { mm_dw(args); }
   else
   {
-    int blockSize = (N+CORES-1) / CORES;
+    int blockSize = (N+NUM_CORES-1) / NUM_CORES;
     int start = pi_core_id()*blockSize;
     int stop = start+blockSize > N ? N : start+blockSize;
 
@@ -3792,7 +3792,7 @@ void mm_dw_u3(void * void_args) {
   if (ker_dim < 3) { mm_dw(args); }
   else
   {
-    int blockSize = (N+CORES-1) / CORES;
+    int blockSize = (N+NUM_CORES-1) / NUM_CORES;
     int start = pi_core_id()*blockSize;
     int stop = start+blockSize > N ? N : start+blockSize;
 
@@ -3848,7 +3848,7 @@ void mm_dw_unroll_1x2(void * void_args) {
   if (M < 2) { mm_dw(args); }
   else 
   {
-    int blockSize = (N+CORES-1) / CORES;
+    int blockSize = (N+NUM_CORES-1) / NUM_CORES;
     int start = pi_core_id()*blockSize;
     int stop = start+blockSize > N ? N : start+blockSize;
 
@@ -3909,7 +3909,7 @@ void mm_dw_unroll_1x4(void * void_args) {
   {
     int M_left = M % 4;
 
-    int blockSize = (N+CORES-1) / CORES;
+    int blockSize = (N+NUM_CORES-1) / NUM_CORES;
     int start = pi_core_id()*blockSize;
     int stop = start+blockSize > N ? N : start+blockSize;
 
@@ -3977,7 +3977,7 @@ void mm_dw_unroll_1x2_u2(void * void_args) {
   else if (ker_dim < 2)   { mm_dw_unroll_1x2(args); }
   else 
   {
-    int blockSize = (N+CORES-1) / CORES;
+    int blockSize = (N+NUM_CORES-1) / NUM_CORES;
     int start = pi_core_id()*blockSize;
     int stop = start+blockSize > N ? N : start+blockSize;
 
@@ -4051,7 +4051,7 @@ void mm_dw_unroll_1x4_u2(void * void_args) {
   {
     int M_left = M % 4;
 
-    int blockSize = (N+CORES-1) / CORES;
+    int blockSize = (N+NUM_CORES-1) / NUM_CORES;
     int start = pi_core_id()*blockSize;
     int stop = start+blockSize > N ? N : start+blockSize;
 
@@ -4132,7 +4132,7 @@ void mm_dw_in_grad_u2(void * void_args)
   if (ker_dim < 2)  { mm_dw_in_grad(args); }
   else
   {
-    int blockSize = ((K/ker_dim)+CORES-1) / CORES;
+    int blockSize = ((K/ker_dim)+NUM_CORES-1) / NUM_CORES;
     int start = pi_core_id()*blockSize;
     int stop = start+blockSize > (K/ker_dim) ? (K/ker_dim) : start+blockSize;
 
@@ -4177,7 +4177,7 @@ void mm_dw_in_grad_u3(void * void_args)
   if (ker_dim < 3)  { mm_dw_in_grad(args); }
   else
   {
-    int blockSize = ((K/ker_dim)+CORES-1) / CORES;
+    int blockSize = ((K/ker_dim)+NUM_CORES-1) / NUM_CORES;
     int start = pi_core_id()*blockSize;
     int stop = start+blockSize > (K/ker_dim) ? (K/ker_dim) : start+blockSize;
 
@@ -4227,7 +4227,7 @@ void mm_dw_in_grad_unroll_1x2(void * void_args) {
   if (M < 2) { mm_dw_in_grad(args); }
   else 
   {
-    int blockSize = ((K/ker_dim)+CORES-1) / CORES;
+    int blockSize = ((K/ker_dim)+NUM_CORES-1) / NUM_CORES;
     int start = pi_core_id()*blockSize;
     int stop = start+blockSize > (K/ker_dim) ? (K/ker_dim) : start+blockSize;
 
@@ -4296,7 +4296,7 @@ void mm_dw_in_grad_unroll_1x4(void * void_args) {
   {
     int M_left = M % 4;
 
-    int blockSize = ((K/ker_dim)+CORES-1) / CORES;
+    int blockSize = ((K/ker_dim)+NUM_CORES-1) / NUM_CORES;
     int start = pi_core_id()*blockSize;
     int stop = start+blockSize > (K/ker_dim) ? (K/ker_dim) : start+blockSize;
 
@@ -4375,7 +4375,7 @@ void mm_dw_in_grad_unroll_1x2_u2(void * void_args) {
   else if (ker_dim < 2)   { mm_dw_in_grad_unroll_1x2(args); }
   else 
   {
-    int blockSize = ((K/ker_dim)+CORES-1) / CORES;
+    int blockSize = ((K/ker_dim)+NUM_CORES-1) / NUM_CORES;
     int start = pi_core_id()*blockSize;
     int stop = start+blockSize > (K/ker_dim) ? (K/ker_dim) : start+blockSize;
 
@@ -4467,7 +4467,7 @@ void mm_dw_in_grad_unroll_1x4_u2(void * void_args) {
   {
     int M_left = M % 4;
 
-    int blockSize = ((K/ker_dim)+CORES-1) / CORES;
+    int blockSize = ((K/ker_dim)+NUM_CORES-1) / NUM_CORES;
     int start = pi_core_id()*blockSize;
     int stop = start+blockSize > (K/ker_dim) ? (K/ker_dim) : start+blockSize;
 

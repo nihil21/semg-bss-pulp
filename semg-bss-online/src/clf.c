@@ -1,9 +1,25 @@
+/*
+Copyright 2022 Mattia Orlandi
+
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+
+http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+*/
+
 #include <float.h>
 #include <string.h>
-#include "../include/clf.h"
-#include "../include/shared_buf.h"
-#include "../include/pulp_train_utils_fp32.h"
-#include "../include/pulp_matmul_fp32.h"
+#include "clf.h"
+#include "shared_buf.h"
+#include "pulp_train_utils_fp32.h"
+#include "pulp_matmul_fp32.h"
 
 /*
  * Function executed by each core in the cluster (DNN)
@@ -73,7 +89,7 @@ static void clf_dnn_fn(void *args) {
         memset(act1.data, 0, N_TA * N_MU * sizeof(float));
     }
     pi_cl_team_barrier();
-    size_t i_chunk = (N_MU + CORES) / CORES;
+    size_t i_chunk = (N_MU + NUM_CORES) / NUM_CORES;
     size_t i_start = core_id * i_chunk;
     size_t i_end = i_start + i_chunk < N_MU ? i_start + i_chunk : N_MU;
     for (size_t i = i_start; i < i_end; i++) {
@@ -130,7 +146,7 @@ static void clf_dnn_fn(void *args) {
     add_row_w(&act2, &dnn2_b);
 
     // Second layer: ReLU
-    size_t j_chunk = (N_CA + CORES) / CORES;
+    size_t j_chunk = (N_CA + NUM_CORES) / NUM_CORES;
     size_t j_start = core_id * j_chunk;
     size_t j_end = j_start + j_chunk < N_CA ? j_start + j_chunk : N_CA;
     for (size_t j = j_start; j < j_end; j++) {
@@ -215,7 +231,7 @@ static void clf_svm_fn(void *args) {
         // Clear memory for results
         memset(spk_cnt.data, 0, N_MU * sizeof(float));
     }
-    size_t j_chunk = (N_SAMPLES + CORES - 1) / CORES;
+    size_t j_chunk = (N_SAMPLES + NUM_CORES - 1) / NUM_CORES;
     size_t j_start = core_id * j_chunk;
     size_t j_end = j_start + j_chunk < N_SAMPLES ? j_start + j_chunk : N_SAMPLES;
     for (size_t i = 0; i < N_MU; i++) {
@@ -307,9 +323,9 @@ void clf_entry(void *args) {
 
     // Spawn team of parallel processes
 #if defined(USE_SVM)
-    pi_cl_team_fork(CORES, clf_svm_fn, args);
+    pi_cl_team_fork(NUM_CORES, clf_svm_fn, args);
 #else
-    pi_cl_team_fork(CORES, clf_dnn_fn, args);
+    pi_cl_team_fork(NUM_CORES, clf_dnn_fn, args);
 #endif
 
     pi_perf_stop();

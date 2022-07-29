@@ -1,4 +1,20 @@
-#include "../include/matrix.h"
+/*
+Copyright 2022 Mattia Orlandi
+
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+
+http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+*/
+
+#include "matrix.h"
 
 /*
  * Move matrices from Fabric Controller to Cluster
@@ -45,7 +61,7 @@ Matrix slice(const Matrix *m, const size_t row_start, const size_t row_stop, con
  */
 void add_row_h(const Matrix *m, const Matrix *r) {
     const size_t core_id = pi_core_id();
-    const size_t i_chunk = (m->height + CORES - 1) / CORES;
+    const size_t i_chunk = (m->height + NUM_CORES - 1) / NUM_CORES;
     const size_t i_start = core_id * i_chunk;
     const size_t i_end = i_start + i_chunk < m->height ? i_start + i_chunk : m->height;
 
@@ -61,7 +77,7 @@ void add_row_h(const Matrix *m, const Matrix *r) {
  */
 void add_row_w(const Matrix *m, const Matrix *r) {
     const size_t core_id = pi_core_id();
-    const size_t j_chunk = (m->width + CORES - 1) / CORES;
+    const size_t j_chunk = (m->width + NUM_CORES - 1) / NUM_CORES;
     const size_t j_start = core_id * j_chunk;
     const size_t j_end = j_start + j_chunk < m->width ? j_start + j_chunk : m->width;
 
@@ -77,7 +93,7 @@ void add_row_w(const Matrix *m, const Matrix *r) {
  */
 void sub_col_h(const Matrix *m, const Matrix *c) {
     const size_t core_id = pi_core_id();
-    const size_t i_chunk = (m->height + CORES - 1) / CORES;
+    const size_t i_chunk = (m->height + NUM_CORES - 1) / NUM_CORES;
     const size_t i_start = core_id * i_chunk;
     const size_t i_end = i_start + i_chunk < m->height ? i_start + i_chunk : m->height;
 
@@ -95,7 +111,7 @@ void sub_col_h(const Matrix *m, const Matrix *c) {
  */
 void sub_col_w(const Matrix *m, const Matrix *c) {
     const size_t core_id = pi_core_id();
-    const size_t j_chunk = (m->width + CORES - 1) / CORES;
+    const size_t j_chunk = (m->width + NUM_CORES - 1) / NUM_CORES;
     const size_t j_start = core_id * j_chunk;
     const size_t j_end = j_start + j_chunk < m->width ? j_start + j_chunk : m->width;
 

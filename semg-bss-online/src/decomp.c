@@ -1,8 +1,24 @@
+/*
+Copyright 2022 Mattia Orlandi
+
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+
+http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+*/
+
 #include <string.h>
-#include "../include/decomp.h"
-#include "../include/shared_buf.h"
-#include "../include/pulp_train_utils_fp32.h"
-#include "../include/pulp_matmul_fp32.h"
+#include "decomp.h"
+#include "shared_buf.h"
+#include "pulp_train_utils_fp32.h"
+#include "pulp_matmul_fp32.h"
 
 static Matrix mean_vec = {
     .data = tmp1_data,
@@ -65,7 +81,7 @@ void decomp_fn(void *args) {
             .width = EXT_WIN,
             .offset = EXT_WIN
         };
-        size_t q_chunk = (EXT_WIN + CORES) / CORES;
+        size_t q_chunk = (EXT_WIN + NUM_CORES) / NUM_CORES;
         size_t q_start = core_id * q_chunk;
         size_t q_end = q_start + q_chunk < EXT_WIN ? q_start + q_chunk : EXT_WIN;
         for (size_t i = 0; i < FE; i++) {
@@ -160,7 +176,7 @@ void decomp_entry(void *args) {
     pi_perf_start();
 
     // Spawn team of parallel processes
-    pi_cl_team_fork(CORES, decomp_fn, (void *) emg_l2);
+    pi_cl_team_fork(NUM_CORES, decomp_fn, (void *) emg_l2);
 
     pi_perf_stop();
 
