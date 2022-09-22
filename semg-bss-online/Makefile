@@ -1,6 +1,6 @@
 APP = semg-bss-online
 
-APP_SRCS += ./src/main.c ./src/hand_open.c ./src/separator.c ./src/dnn.c ./src/svm.c ./src/matrix.c ./src/decomp.c ./src/clf.c ./src/shared_buf.c ./src/pulp_matmul_fp32.c ./src/pulp_train_utils_fp32.c
+APP_SRCS += ./src/main.c ./src/fist.c ./src/separator.c ./src/mlp_light.c ./src/svm.c ./src/matrix.c ./src/decomp.c ./src/clf.c ./src/shared_buf.c ./src/pulp_matmul_fp32.c ./src/pulp_train_utils_fp32.c
 APP_CFLAGS += -I. -I./include
 
 # Number of cores of the cluster to use

@@ -22,52 +22,52 @@ limitations under the License.
 #include "pulp_matmul_fp32.h"
 
 /*
- * Function executed by each core in the cluster (DNN)
+ * Function executed by each core in the cluster (MLPLight)
  */
-static void clf_dnn_fn(void *args) {
+static void clf_mlp_light_fn(void *args) {
     const size_t core_id = pi_core_id();
 
     // Unpack arguments
-    Matrix *dnn1_w_l2 = ((DNNArgs *) args)->dnn1_w;
-    Matrix *dnn1_b_l2 = ((DNNArgs *) args)->dnn1_b;
-    Matrix *dnn2_w_l2 = ((DNNArgs *) args)->dnn2_w;
-    Matrix *dnn2_b_l2 = ((DNNArgs *) args)->dnn2_b;
-    Matrix *dnn3_w_l2 = ((DNNArgs *) args)->dnn3_w;
-    Matrix *dnn3_b_l2 = ((DNNArgs *) args)->dnn3_b;
-    uint8_t *class = ((DNNArgs *) args)->class;
+    Matrix *mlp_light1_w_l2 = ((MLPLightArgs *) args)->mlp_light1_w;
+    Matrix *mlp_light1_b_l2 = ((MLPLightArgs *) args)->mlp_light1_b;
+    Matrix *mlp_light2_w_l2 = ((MLPLightArgs *) args)->mlp_light2_w;
+    Matrix *mlp_light2_b_l2 = ((MLPLightArgs *) args)->mlp_light2_b;
+    Matrix *mlp_light3_w_l2 = ((MLPLightArgs *) args)->mlp_light3_w;
+    Matrix *mlp_light3_b_l2 = ((MLPLightArgs *) args)->mlp_light3_b;
+    uint8_t *class = ((MLPLightArgs *) args)->class;
     
     // Prepare L1 matrices
-    Matrix dnn1_b = {
+    Matrix mlp_light1_b = {
         .data = tmp1_data,
         .height = 1,
         .width = N_TA,
         .offset = N_TA
     };
-    Matrix dnn2_b = {
+    Matrix mlp_light2_b = {
         .data = tmp1_data,
         .height = 1,
         .width = N_CA,
         .offset = N_CA
     };
-    Matrix dnn3_b = {
+    Matrix mlp_light3_b = {
         .data = tmp1_data,
         .height = 1,
         .width = N_OUT,
         .offset = N_OUT
     };
-    Matrix dnn1_w = {
+    Matrix mlp_light1_w = {
         .data = tmp2_data,
         .height = N_TA,
         .width = N_SAMPLES,
         .offset = N_SAMPLES
     };
-    Matrix dnn2_w = {
+    Matrix mlp_light2_w = {
         .data = tmp2_data,
         .height = N_CA,
         .width = N_TA * N_MU,
         .offset = N_TA * N_MU
     };
-    Matrix dnn3_w = {
+    Matrix mlp_light3_w = {
         .data = tmp2_data,
         .height = N_OUT,
         .width = N_CA,
@@ -83,8 +83,8 @@ static void clf_dnn_fn(void *args) {
     };
     if (core_id == 0) {
         // Move weights and biases to L1
-        mat_fc2cl(dnn1_w_l2, &dnn1_w);
-        mat_fc2cl(dnn1_b_l2, &dnn1_b);
+        mat_fc2cl(mlp_light1_w_l2, &mlp_light1_w);
+        mat_fc2cl(mlp_light1_b_l2, &mlp_light1_b);
         // Clear memory for results
         memset(act1.data, 0, N_TA * N_MU * sizeof(float));
     }
@@ -96,13 +96,13 @@ static void clf_dnn_fn(void *args) {
         for (size_t j = 0; j < N_TA; j++) {
             for (size_t k = 0; k < N_SAMPLES; k++) {
                 asm volatile("Mattia:");
-                MAT_CELL(&act1, i, j) += tmp7_data[i * N_SAMPLES + k] == 1 ? MAT_CELL(&dnn1_w, j, k) : 0.0f;  // (N_MU x N_SAMPLES) @ (N_TA x N_SAMPLES).T -> (N_MU x N_TA)
+                MAT_CELL(&act1, i, j) += tmp7_data[i * N_SAMPLES + k] == 1 ? MAT_CELL(&mlp_light1_w, j, k) : 0.0f;  // (N_MU x N_SAMPLES) @ (N_TA x N_SAMPLES).T -> (N_MU x N_TA)
             }
         }
     }
     pi_cl_team_barrier();
     // Add bias
-    add_row_h(&act1, &dnn1_b);  // (N_MU x N_TA) + (1, N_TA) -> (N_MU x N_TA)
+    add_row_h(&act1, &mlp_light1_b);  // (N_MU x N_TA) + (1, N_TA) -> (N_MU x N_TA)
 
     // First layer: ReLU
     for (size_t i = i_start; i < i_end; i++) {
@@ -126,15 +126,15 @@ static void clf_dnn_fn(void *args) {
     };
     if (core_id == 0) {
         // Move weights and biases to L1
-        mat_fc2cl(dnn2_w_l2, &dnn2_w);
-        mat_fc2cl(dnn2_b_l2, &dnn2_b);
+        mat_fc2cl(mlp_light2_w_l2, &mlp_light2_w);
+        mat_fc2cl(mlp_light2_b_l2, &mlp_light2_b);
         // Clear memory for results
         memset(act2.data, 0, N_CA * sizeof(float));
     }
     pi_cl_team_barrier();
     struct matMul_args mm_args1 = {
         .A = act1.data,
-        .B = dnn2_w.data,
+        .B = mlp_light2_w.data,
         .C = act2.data,
         .N = 1,
         .M = N_CA,
@@ -143,7 +143,7 @@ static void clf_dnn_fn(void *args) {
     };
     mm_M_unroll_2x1((void *) &mm_args1);  // (1 x N_MU * N_TA) @ (N_CA x N_MU * N_TA).T -> (1 x N_CA)
     // Add bias
-    add_row_w(&act2, &dnn2_b);
+    add_row_w(&act2, &mlp_light2_b);
 
     // Second layer: ReLU
     size_t j_chunk = (N_CA + NUM_CORES) / NUM_CORES;
@@ -162,15 +162,15 @@ static void clf_dnn_fn(void *args) {
     };
     if (core_id == 0) {
         // Move weights and biases to L1
-        mat_fc2cl(dnn3_w_l2, &dnn3_w);
-        mat_fc2cl(dnn3_b_l2, &dnn3_b);
+        mat_fc2cl(mlp_light3_w_l2, &mlp_light3_w);
+        mat_fc2cl(mlp_light3_b_l2, &mlp_light3_b);
         // Clear memory for results
         memset(act3.data, 0, N_OUT * sizeof(float));
     }
     pi_cl_team_barrier();
     struct matMul_args mm_args3 = {
         .A = act2.data,
-        .B = dnn3_w.data,
+        .B = mlp_light3_w.data,
         .C = act3.data,
         .N = 1,
         .M = N_OUT,
@@ -179,7 +179,7 @@ static void clf_dnn_fn(void *args) {
     };
     mm_M_unroll_2x1((void *) &mm_args3);  // (1 x N_CA) @ (N_OUT x N_CA).T -> (1 x N_OUT)
     // Add bias
-    add_row_w(&act3, &dnn3_b);
+    add_row_w(&act3, &mlp_light3_b);
 
     if (core_id == 0) {
         // Argmax
@@ -325,7 +325,7 @@ void clf_entry(void *args) {
 #if defined(USE_SVM)
     pi_cl_team_fork(NUM_CORES, clf_svm_fn, args);
 #else
-    pi_cl_team_fork(NUM_CORES, clf_dnn_fn, args);
+    pi_cl_team_fork(NUM_CORES, clf_mlp_light_fn, args);
 #endif
 
     pi_perf_stop();

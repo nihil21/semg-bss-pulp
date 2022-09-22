@@ -22,14 +22,14 @@ limitations under the License.
 
 typedef struct {
     Matrix *firings;
-    Matrix *dnn1_w;
-    Matrix *dnn1_b;
-    Matrix *dnn2_w;
-    Matrix *dnn2_b;
-    Matrix *dnn3_w;
-    Matrix *dnn3_b;
+    Matrix *mlp_light1_w;
+    Matrix *mlp_light1_b;
+    Matrix *mlp_light2_w;
+    Matrix *mlp_light2_b;
+    Matrix *mlp_light3_w;
+    Matrix *mlp_light3_b;
     uint8_t *class;
-} DNNArgs;
+} MLPLightArgs;
 
 typedef struct {
     Matrix *firings;

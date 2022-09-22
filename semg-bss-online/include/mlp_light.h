@@ -14,16 +14,16 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-#ifndef DNN_H
-#define DNN_H
+#ifndef MLP_LIGHT_H
+#define MLP_LIGHT_H
 
 #include "pmsis.h"
 
-PI_L2 extern float dnn1_w_data[];
-PI_L2 extern float dnn1_b_data[];
-PI_L2 extern float dnn2_w_data[];
-PI_L2 extern float dnn2_b_data[];
-PI_L2 extern float dnn3_w_data[];
-PI_L2 extern float dnn3_b_data[];
+PI_L2 extern float mlp_light1_w_data[];
+PI_L2 extern float mlp_light1_b_data[];
+PI_L2 extern float mlp_light2_w_data[];
+PI_L2 extern float mlp_light2_b_data[];
+PI_L2 extern float mlp_light3_w_data[];
+PI_L2 extern float mlp_light3_b_data[];
 
 #endif

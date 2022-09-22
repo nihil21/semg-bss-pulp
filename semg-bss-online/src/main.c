@@ -16,9 +16,9 @@ limitations under the License.
 
 #include <stdio.h>
 #include <stdlib.h>
-#include "hand_open.h"
+#include "fist.h"
 #include "separator.h"
-#include "dnn.h"
+#include "mlp_light.h"
 #include "svm.h"
 #include "shared_buf.h"
 #include "matrix.h"
@@ -59,39 +59,39 @@ static void run_semg_bss() {
         .width = 1,
         .offset = 1
     };
-    // 3. DNN
-    Matrix dnn1_w = {
-        .data = dnn1_w_data,
+    // 3. MLPLight
+    Matrix mlp_light1_w = {
+        .data = mlp_light1_w_data,
         .height = N_TA,
         .width = N_SAMPLES,
         .offset = N_SAMPLES
     };
-    Matrix dnn1_b = {
-        .data = dnn1_b_data,
+    Matrix mlp_light1_b = {
+        .data = mlp_light1_b_data,
         .height = N_TA,
         .width = 1,
         .offset = 1
     };
-    Matrix dnn2_w = {
-        .data = dnn2_w_data,
+    Matrix mlp_light2_w = {
+        .data = mlp_light2_w_data,
         .height = N_CA,
         .width = N_MU * N_TA,
         .offset = N_MU * N_TA
     };
-    Matrix dnn2_b = {
-        .data = dnn2_b_data,
+    Matrix mlp_light2_b = {
+        .data = mlp_light2_b_data,
         .height = N_CA,
         .width = 1,
         .offset = 1
     };
-    Matrix dnn3_w = {
-        .data = dnn3_w_data,
+    Matrix mlp_light3_w = {
+        .data = mlp_light3_w_data,
         .height = N_OUT,
         .width = N_CA,
         .offset = N_CA
     };
-    Matrix dnn3_b = {
-        .data = dnn3_b_data,
+    Matrix mlp_light3_b = {
+        .data = mlp_light3_b_data,
         .height = N_OUT,
         .width = 1,
         .offset = 1
@@ -142,14 +142,14 @@ static void run_semg_bss() {
         .class = &class
     };
 #else
-    printf("Using DNN\n");
-    DNNArgs clf_args = {
-        .dnn1_w = &dnn1_w,
-        .dnn1_b = &dnn1_b,
-        .dnn2_w = &dnn2_w,
-        .dnn2_b = &dnn2_b,
-        .dnn3_w = &dnn3_w,
-        .dnn3_b = &dnn3_b,
+    printf("Using MLPLight\n");
+    MLPLightArgs clf_args = {
+        .mlp_light1_w = &mlp_light1_w,
+        .mlp_light1_b = &mlp_light1_b,
+        .mlp_light2_w = &mlp_light2_w,
+        .mlp_light2_b = &mlp_light2_b,
+        .mlp_light3_w = &mlp_light3_w,
+        .mlp_light3_b = &mlp_light3_b,
         .class = &class
     };
 #endif
