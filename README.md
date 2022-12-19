@@ -1,5 +1,5 @@
 # sEMG BSS on PULP
-Blind source separation of sEMG signals on PULP platform (inference only).
+Blind source separation of sEMG signals on PULP platform (inference only). This code has been used in the paper [Mattia Orlandi et al., sEMG Neural Spikes Reconstruction for Gesture Recognition on a Low-Power Multicore Processor. In: Biomedical Circuits and Systems](https://dx.doi.org/10.1109/BioCAS54905.2022.9948617).
 
 ## Usage
 First of all, use `docker-compose run --rm pulp` to run the container and open a shell.
