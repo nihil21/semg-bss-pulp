@@ -117,7 +117,8 @@ void decomp_fn(void *args) {
             .K = N_CH_EXT
         };
         mm_unroll_1x8((void *) &mm_args1);  // (N_CH_EXT x N_CH_EXT) @ (N_CH_EXT x EXT_WIN) -> (N_CH_EXT x EXT_WIN)
-        
+        pi_cl_team_barrier();
+
         // Decomposition
         Matrix muapt_slice = {
             .data = tmp6_data,
