@@ -3,4 +3,4 @@ services:
   semg-bss-online:
     build: .
     volumes:
-    - ./semg-bss-online:/home/pulp/semg-bss-online
+    - ./semg-bss-online:/semg-bss-online
