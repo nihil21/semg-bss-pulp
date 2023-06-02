@@ -140,6 +140,7 @@ void decomp_fn(void *args) {
             .K = N_CH_EXT
         };
         mm_unroll_1x8((void *) &mm_args2);  // (N_MU x N_CH_EXT) @ (N_CH_EXT x EXT_WIN) -> (N_MU x EXT_WIN)
+        pi_cl_team_barrier();
         
         // Post-processing: spike detection
         for (int i = 0; i < N_MU; i++) {
